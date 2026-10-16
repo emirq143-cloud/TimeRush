@@ -16,22 +16,43 @@ android {
     applicationId = "com.aistudio.tensecchallenge.nvqkz"
     minSdk = 24
     targetSdk = 36
-    versionCode = 1
-    versionName = "1.0"
+    versionCode = 3
+    versionName = "1.2"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
   signingConfigs {
     create("release") {
-      val keystorePath = System.getenv("KEYSTORE_PATH") ?: "${rootDir}/my-upload-key.jks"
-      storeFile = file(keystorePath)
-      storePassword = System.getenv("STORE_PASSWORD")
-      keyAlias = "upload"
-      keyPassword = System.getenv("KEY_PASSWORD")
+      val envPath = System.getenv("KEYSTORE_PATH")
+      val desktopKey = file("${System.getProperty("user.home")}/Desktop/timerush_key.jks")
+      val rootKey = file("${rootDir}/my-upload-key.jks")
+      val selectedFile = when {
+        !envPath.isNullOrBlank() -> file(envPath)
+        desktopKey.exists() -> desktopKey
+        rootKey.exists() -> rootKey
+        else -> null
+      }
+      val storePass = System.getenv("STORE_PASSWORD")
+      val keyPass = System.getenv("KEY_PASSWORD")
+      if (selectedFile != null && selectedFile.exists() && !storePass.isNullOrBlank() && !keyPass.isNullOrBlank()) {
+        storeFile = selectedFile
+        storePassword = storePass
+        keyAlias = System.getenv("KEY_ALIAS") ?: "upload"
+        keyPassword = keyPass
+      } else {
+        val rootKeystore = file("${rootDir}/debug.keystore")
+        val userKeystore = file("${System.getProperty("user.home")}/.android/debug.keystore")
+        storeFile = if (rootKeystore.exists()) rootKeystore else userKeystore
+        storePassword = "android"
+        keyAlias = "androiddebugkey"
+        keyPassword = "android"
+      }
     }
     create("debugConfig") {
-      storeFile = file("${rootDir}/debug.keystore")
+      val rootKeystore = file("${rootDir}/debug.keystore")
+      val userKeystore = file("${System.getProperty("user.home")}/.android/debug.keystore")
+      storeFile = if (rootKeystore.exists()) rootKeystore else userKeystore
       storePassword = "android"
       keyAlias = "androiddebugkey"
       keyPassword = "android"
@@ -138,4 +159,6 @@ dependencies {
 
 tasks.withType<Test> {
   failFast = true
+  systemProperty("user.language", "en")
+  systemProperty("user.country", "US")
 }

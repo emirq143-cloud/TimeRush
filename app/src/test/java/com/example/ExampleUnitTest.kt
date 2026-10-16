@@ -54,6 +54,7 @@ class ExampleUnitTest {
     assertFalse(ProfanityFilter.containsProfanity("Cemal"))
     assertFalse(ProfanityFilter.containsProfanity("Zehra_06"))
     assertFalse(ProfanityFilter.containsProfanity("Kartal"))
+    assertFalse(ProfanityFilter.containsProfanity("Oyuncu"))
     assertFalse(ProfanityFilter.containsProfanity("Emir"))
     assertFalse(ProfanityFilter.containsProfanity("Can"))
     assertFalse(ProfanityFilter.containsProfanity("Burak"))
@@ -64,6 +65,7 @@ class ExampleUnitTest {
 
   @Test
   fun nicknameValidation_worksCorrectly() {
+    assertTrue(ProfanityFilter.validateNickname("Oyuncu") is NicknameValidationResult.Valid)
     assertTrue(ProfanityFilter.validateNickname("Emir") is NicknameValidationResult.Valid)
     assertTrue(ProfanityFilter.validateNickname("Kartal99") is NicknameValidationResult.Valid)
     assertTrue(ProfanityFilter.validateNickname("Kemal_TR") is NicknameValidationResult.Valid)
